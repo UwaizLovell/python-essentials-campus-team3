@@ -46,8 +46,30 @@ def withdraw_student(courses, students):
 # ==========================
 
 def register_student(students):
-    pass
+    print("\n--- Register Student ---")
 
+    student_id = input("Enter student ID: ").strip().upper()
+
+    while student_id == "":
+        print("Student ID cannot be blank.")
+        student_id = input("Enter student ID: ").strip().upper()
+
+    if student_id in students:
+        print("Student ID already exists.")
+        return
+
+    student_name = input("Enter student name: ").strip()
+
+    while student_name == "":
+        print("Student name cannot be blank.")
+        student_name = input("Enter student name: ").strip()
+
+    students[student_id] = {
+        "name": student_name,
+        "enrolments": {}
+    }
+
+    print("Student registered successfully.")
 
 def record_mark(courses, students):
     pass
