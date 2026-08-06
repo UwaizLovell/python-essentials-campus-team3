@@ -76,7 +76,19 @@ def record_mark(courses, students):
 
 
 def course_average_for(students, student_id, course_id):
-    pass
+     marks = students[student_id]["enrolments"][course_id]
+
+    if len(marks) == 0:
+        return (0, 0)
+
+    total = 0
+
+    for mark in marks:
+        total = total + mark
+
+    average = total / len(marks)
+
+    return (average, len(marks))
 
 
 def student_transcript(courses, students):
