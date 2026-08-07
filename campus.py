@@ -105,8 +105,63 @@ def add_course(courses):
     )
 
 
+# Enrols a student into a course
 def enrol_student(courses, students):
-    pass
+
+    # Ask the user for the student ID
+    student_id = input("Student ID: ").strip()
+
+    # Ask the user for the course ID
+    course_id = input("Course ID: ").strip()
+
+ # Check if the student exists
+    if student_id not in students:
+        print("Student not found.")
+        return
+
+    # Check if the course exists
+    if course_id not in courses:
+        print("Course not found.")
+        return
+
+    # Check if the course has reached its maximum capacity
+    if len(courses[course_id]["roster"]) >= courses[course_id]["capacity"]:
+        print(
+            course_id + ": " +
+            courses[course_id]["name"] +
+            " is full (" +
+            str(len(courses[course_id]["roster"])) +
+            "/" +
+            str(courses[course_id]["capacity"]) +
+            " enrolled)."
+        )
+        return
+
+    # Check if the student is already enrolled in the course
+    if course_id in students[student_id]["enrolments"]:
+        print(
+            student_id + " " +
+            students[student_id]["name"] +
+            " is already enrolled in " +
+            course_id + ": " +
+            courses[course_id]["name"] + "."
+        )
+        return
+
+    # Add the student to the course roster
+    courses[course_id]["roster"].append(student_id)
+
+    # Add an empty marks list to the student's enrolments
+    students[student_id]["enrolments"][course_id] = []
+
+    # Display a success message
+    print(
+        student_id + " " +
+        students[student_id]["name"] +
+        " enrolled in " +
+        course_id + ": " +
+        courses[course_id]["name"]
+    )
 
 
 def withdraw_student(courses, students):
