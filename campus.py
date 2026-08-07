@@ -63,8 +63,46 @@ def highest_and_lowest(students, student_id):
 # Course Functions
 # ==========================
 
+# Adds a new course to the courses dictionary.
 def add_course(courses):
-    pass
+
+    # Ask the user to enter the course name
+    course_name = input("Course name: ").strip()
+
+    # Check if the course name is blank
+    if course_name == "":
+        print("Course name cannot be blank.")
+        return
+
+    # Ask the user to enter the course capacity
+    capacity = read_valid_number("Capacity (1-100): ", 1, 100)
+
+    # Ask the user to enter the course pass mark
+    pass_mark = read_valid_number("Pass mark (0-100): ", 0, 100)
+
+    # Generate the next course ID
+    course_id = "C" + str(len(courses) + 1)
+
+    # Create the new course in the courses dictionary
+    courses[course_id] = {
+        "name": course_name,
+        "capacity": capacity,
+        "pass_mark": pass_mark,
+        "roster": []
+    }
+
+    # Confirm that the course was added successfully
+    print(
+        "Added "
+        + course_id
+        + ": "
+        + course_name
+        + " (capacity "
+        + str(capacity)
+        + ", pass mark "
+        + str(pass_mark)
+        + ")"
+    )
 
 
 def enrol_student(courses, students):
