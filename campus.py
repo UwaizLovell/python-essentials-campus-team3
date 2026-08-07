@@ -164,8 +164,66 @@ def enrol_student(courses, students):
     )
 
 
+    # Withdraws a student from a course
 def withdraw_student(courses, students):
-    pass
+
+    # Ask the user for the student ID
+    student_id = input("Student ID: ").strip()
+
+    # Ask the user for the course ID
+    course_id = input("Course ID: ").strip()
+
+    # Check if the student exists
+    if student_id not in students:
+        print("Student not found.")
+        return
+
+    # Check if the course exists
+    if course_id not in courses:
+        print("Course not found.")
+        return
+
+    # Check if the student is enrolled in the course
+    if course_id not in students[student_id]["enrolments"]:
+        print(
+            student_id + " " +
+            students[student_id]["name"] +
+            " is not enrolled in " +
+            course_id + ": " +
+            courses[course_id]["name"] + "."
+        )
+        return
+
+    # Ask the user to confirm the withdrawal
+    confirm = input(
+        "Withdraw " +
+        student_id + " " +
+        students[student_id]["name"] +
+        " from " +
+        course_id + ": " +
+        courses[course_id]["name"] +
+        "? (y/n): "
+    ).strip().lower()
+
+    # Check if the user confirmed the withdrawal
+    if confirm != "y":
+        print("Withdrawal cancelled.")
+        return
+
+    # Remove the student from the course roster
+    courses[course_id]["roster"].remove(student_id)
+
+    # Remove the course from the student's enrolments
+    del students[student_id]["enrolments"][course_id]
+
+    # Display a success message
+    print(
+        student_id + " " +
+        students[student_id]["name"] +
+        " withdrawn from " +
+        course_id + ": " +
+        courses[course_id]["name"]
+    )
 
 
 # ==========================
