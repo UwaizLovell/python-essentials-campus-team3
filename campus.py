@@ -8,8 +8,42 @@
 # Helper Functions
 # ==========================
 
+# Reads and validates a whole number within a given range.
 def read_valid_number(prompt, minimum, maximum):
-    pass
+
+    # Keep asking the user until they enter a valid number
+    while True:
+
+        # Ask the user for a value and remove any spaces
+        user_input = input(prompt).strip()
+
+        # Try to convert the user's input into an integer
+        try:
+
+            # Convert the input into an integer
+            number = int(user_input)
+
+            # Check if the number is within the allowed range
+            if number >= minimum and number <= maximum:
+
+                # Return the valid number to the calling function
+                return number
+
+            # Inform the user that the number is outside the allowed range
+            else:
+                print(
+                    "Please enter a whole number between "
+                    + str(minimum)
+                    + " and "
+                    + str(maximum)
+                    + "."
+                )
+
+        # Handle anything that cannot be converted into an integer
+        except ValueError:
+
+            # Inform the user that the input was not a whole number
+            print("Please enter a valid whole number.")
 
 
 def academy_totals(students):
