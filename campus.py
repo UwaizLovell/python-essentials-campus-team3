@@ -47,11 +47,77 @@ def read_valid_number(prompt, minimum, maximum):
 
 
 def academy_totals(students):
-    pass
+
+    # Count the number of students
+    total_students = len(students)
+
+    # Start counting enrolments and marks
+    total_enrolments = 0
+    total_marks = 0
+
+    # Go through every student
+    for student_id in students:
+
+        # Go through every course the student is enrolled in
+        for course_id in students[student_id]["enrolments"]:
+
+            # Count one enrolment
+            total_enrolments += 1
+
+            # Count all marks recorded for this enrolment
+            total_marks += len(
+                students[student_id]["enrolments"][course_id]
+            )
+
+    # Return the totals as a tuple
+    return (
+        total_students,
+        total_enrolments,
+        total_marks
+    )
 
 
 def best_course(courses, students):
-    pass
+    
+    # Store the best course found so far
+    best_course_id = None
+    best_average = None
+
+    # Go through every course
+    for course_id in courses:
+
+        # Keep track of the total marks and number of marks
+        total = 0
+        count = 0
+
+        # Check every student
+        for student_id in students:
+
+            # Check if the student is enrolled in this course
+            if course_id in students[student_id]["enrolments"]:
+
+                # Go through every mark for this course
+                for mark in students[student_id]["enrolments"][course_id]:
+
+                    # Add the mark to the total
+                    total += mark
+
+                    # Count the mark
+                    count += 1
+
+        # Only calculate an average if marks exist
+        if count > 0:
+
+            average = total / count
+
+            # Check if this is the highest average so far
+            if best_average is None or average > best_average:
+
+                best_average = average
+                best_course_id = course_id
+
+    # Return the result as a tuple
+    return (best_course_id, best_average)
 
 
 # Team choice tuple helper
