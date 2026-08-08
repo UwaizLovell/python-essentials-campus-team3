@@ -133,7 +133,53 @@ def course_average_for(students, student_id, course_id):
 
 
 def student_transcript(courses, students):
-    pass
+    print("\n--- Student Transcript ---")
+
+    student_id = input("Enter student ID: ").strip().upper()
+
+    while student_id == "":
+        print("Student ID cannot be blank.")
+        student_id = input("Enter student ID: ").strip().upper()
+
+    if student_id not in students:
+        print("Student does not exist.")
+        return
+
+    print("\nStudent ID:", student_id)
+    print("Student name:", students[student_id]["name"])
+
+    if len(students[student_id]["enrolments"]) == 0:
+        print("This student has no enrolments.")
+        return
+
+    overall_total = 0
+    overall_mark_count = 0
+
+    for course_id in students[student_id]["enrolments"]:
+        marks = students[student_id]["enrolments"][course_id]
+
+        print("\nCourse ID:", course_id)
+        print("Course name:", courses[course_id]["name"])
+
+        if len(marks) == 0:
+            print("No marks recorded.")
+        else:
+            average, mark_count = course_average_for(
+                students, student_id, course_id
+            )
+
+            print("Marks:", marks)
+            print("Course average:", round(average, 2))
+
+            for mark in marks:
+                overall_total = overall_total + mark
+                overall_mark_count = overall_mark_count + 1
+
+    if overall_mark_count == 0:
+        print("\nOverall average: No marks recorded.")
+    else:
+        overall_average = overall_total / overall_mark_count
+        print("\nOverall average:", round(overall_average, 2))
 
 
 # ==========================
