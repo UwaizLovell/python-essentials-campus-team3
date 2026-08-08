@@ -255,7 +255,11 @@ def register_student(students):
         "enrolments": {}
     }
 
-    print("Student registered successfully.")
+    print(
+        student_id + " " +
+        students[student_id]["name"] +
+        " registered successfully."
+    )
 
 def record_mark(courses, students):
     print("\n--- Record Mark ---")
@@ -299,7 +303,14 @@ def record_mark(courses, students):
             break
 
     students[student_id]["enrolments"][course_id].append(mark)
-    print("Mark recorded successfully.")
+    print(
+        str(mark) + " recorded for " +
+        student_id + " " +
+        students[student_id]["name"] +
+        " in " +
+        course_id + ": " +
+        courses[course_id]["name"]
+    )
 
 
 def course_average_for(students, student_id, course_id):
@@ -377,7 +388,7 @@ def course_report(courses, students):
 
 
 def search_everything(courses, students):
-    def search_everything(courses, students):
+    
     print("\n--- Search ---")
     keyword = input("Enter a search keyword: ").strip().lower()
 
