@@ -164,7 +164,8 @@ def enrol_student(courses, students):
     )
 
 
-    # Withdraws a student from a course
+
+# Withdraws a student from a course
 def withdraw_student(courses, students):
 
     # Ask the user for the student ID
