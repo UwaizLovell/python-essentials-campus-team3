@@ -72,11 +72,64 @@ def register_student(students):
     print("Student registered successfully.")
 
 def record_mark(courses, students):
-    pass
+    print("\n--- Record Mark ---")
+
+    student_id = input("Enter student ID: ").strip().upper()
+
+    while student_id == "":
+        print("Student ID cannot be blank.")
+        student_id = input("Enter student ID: ").strip().upper()
+
+    course_id = input("Enter course ID: ").strip().upper()
+
+    while course_id == "":
+        print("Course ID cannot be blank.")
+        course_id = input("Enter course ID: ").strip().upper()
+
+    if student_id not in students:
+        print("Student does not exist.")
+        return
+
+    if course_id not in courses:
+        print("Course does not exist.")
+        return
+
+    if course_id not in students[student_id]["enrolments"]:
+        print("Student is not enrolled in this course.")
+        return
+
+    while True:
+        mark_text = input("Enter mark from 0 to 100: ").strip()
+
+        try:
+            mark = float(mark_text)
+        except ValueError:
+            print("Invalid mark. Enter a number.")
+            continue
+
+        if mark < 0 or mark > 100:
+            print("Mark must be between 0 and 100.")
+        else:
+            break
+
+    students[student_id]["enrolments"][course_id].append(mark)
+    print("Mark recorded successfully.")
 
 
 def course_average_for(students, student_id, course_id):
-    pass
+    marks = students[student_id]["enrolments"][course_id]
+
+    if len(marks) == 0:
+        return (0, 0)
+
+    total = 0
+
+    for mark in marks:
+        total = total + mark
+
+    average = total / len(marks)
+
+    return (average, len(marks))
 
 
 def student_transcript(courses, students):
