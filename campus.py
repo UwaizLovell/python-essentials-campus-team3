@@ -377,7 +377,35 @@ def course_report(courses, students):
 
 
 def search_everything(courses, students):
-    pass
+    def search_everything(courses, students):
+    print("\n--- Search ---")
+    keyword = input("Enter a search keyword: ").strip().lower()
+
+    matched_students = []
+    for student_id, student_info in students.items():
+        name_lower = student_info["name"].lower()
+        if name_lower.count(keyword) > 0:
+            matched_students.append((student_id, student_info["name"]))
+
+    matched_courses = []
+    for course_id, course_info in courses.items():
+        name_lower = course_info["name"].lower()
+        if name_lower.count(keyword) > 0:
+            matched_courses.append((course_id, course_info["name"]))
+
+    if len(matched_students) == 0 and len(matched_courses) == 0:
+        print("No matches.")
+        return
+
+    if len(matched_students) > 0:
+        print("Students:")
+        for student_id, name in matched_students:
+            print(" ", student_id, ":", name)
+
+    if len(matched_courses) > 0:
+        print("Courses:")
+        for course_id, name in matched_courses:
+            print(" ", course_id, ":", name)
 
 
 def academy_report(courses, students):
