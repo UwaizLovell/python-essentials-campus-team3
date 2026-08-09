@@ -8,37 +8,321 @@
 # Helper Functions
 # ==========================
 
+# Reads and validates a whole number within a given range.
 def read_valid_number(prompt, minimum, maximum):
-    pass
+
+    # Keep asking the user until they enter a valid number
+    while True:
+
+        # Ask the user for a value and remove any spaces
+        user_input = input(prompt).strip()
+
+        # Try to convert the user's input into an integer
+        try:
+
+            # Convert the input into an integer
+            number = int(user_input)
+
+            # Check if the number is within the allowed range
+            if number >= minimum and number <= maximum:
+
+                # Return the valid number to the calling function
+                return number
+
+            # Inform the user that the number is outside the allowed range
+            else:
+                print(
+                    "Please enter a whole number between "
+                    + str(minimum)
+                    + " and "
+                    + str(maximum)
+                    + "."
+                )
+
+        # Handle anything that cannot be converted into an integer
+        except ValueError:
+
+            # Inform the user that the input was not a whole number
+            print("Please enter a valid whole number.")
 
 
 def academy_totals(students):
-    pass
+
+    # Count the number of students
+    total_students = len(students)
+
+    # Start counting enrolments and marks
+    total_enrolments = 0
+    total_marks = 0
+
+    # Go through every student
+    for student_id in students:
+
+        # Go through every course the student is enrolled in
+        for course_id in students[student_id]["enrolments"]:
+
+            # Count one enrolment
+            total_enrolments += 1
+
+            # Count all marks recorded for this enrolment
+            total_marks += len(
+                students[student_id]["enrolments"][course_id]
+            )
+
+    # Return the totals as a tuple
+    return (
+        total_students,
+        total_enrolments,
+        total_marks
+    )
 
 
 def best_course(courses, students):
-    pass
+    
+    # Store the best course found so far
+    best_course_id = None
+    best_average = None
+
+    # Go through every course
+    for course_id in courses:
+
+        # Keep track of the total marks and number of marks
+        total = 0
+        count = 0
+
+        # Check every student
+        for student_id in students:
+
+            # Check if the student is enrolled in this course
+            if course_id in students[student_id]["enrolments"]:
+
+                # Go through every mark for this course
+                for mark in students[student_id]["enrolments"][course_id]:
+
+                    # Add the mark to the total
+                    total += mark
+
+                    # Count the mark
+                    count += 1
+
+        # Only calculate an average if marks exist
+        if count > 0:
+
+            average = total / count
+
+            # Check if this is the highest average so far
+            if best_average is None or average > best_average:
+
+                best_average = average
+                best_course_id = course_id
+
+    # Return the result as a tuple
+    return (best_course_id, best_average)
 
 
 # Team choice tuple helper
 def highest_and_lowest(students, student_id):
-    pass
+    if student_id not in students:
+        return None, None
+
+    courses = students[student_id].get("courses", {})
+
+    if not courses:
+        return None, None
+
+    highest_course = None
+    highest_mark = -1
+
+    lowest_course = None
+    lowest_mark = 101
+
+    for course_id, mark in courses.items():
+        if not isinstance(mark, (int, float)):
+            continue
+
+        if mark > highest_mark:
+            highest_mark = mark
+            highest_course = course_id
+
+        if mark < lowest_mark:
+            lowest_mark = mark
+            lowest_course = course_id
+
+    if highest_course is None:
+        return None, None
+
+    return (
+        (highest_course, highest_mark),
+        (lowest_course, lowest_mark)
+    )
 
 
 # ==========================
 # Course Functions
 # ==========================
 
+# Adds a new course to the courses dictionary.
 def add_course(courses):
-    pass
+
+    # Ask the user to enter the course name
+    course_name = input("Course name: ").strip()
+
+    # Check if the course name is blank
+    if course_name == "":
+        print("Course name cannot be blank.")
+        return
+
+    # Ask the user to enter the course capacity
+    capacity = read_valid_number("Capacity (1-100): ", 1, 100)
+
+    # Ask the user to enter the course pass mark
+    pass_mark = read_valid_number("Pass mark (0-100): ", 0, 100)
+
+    # Generate the next course ID
+    course_id = "C" + str(len(courses) + 1)
+
+    # Create the new course in the courses dictionary
+    courses[course_id] = {
+        "name": course_name,
+        "capacity": capacity,
+        "pass_mark": pass_mark,
+        "roster": []
+    }
+
+    # Confirm that the course was added successfully
+    print(
+        "Added "
+        + course_id
+        + ": "
+        + course_name
+        + " (capacity "
+        + str(capacity)
+        + ", pass mark "
+        + str(pass_mark)
+        + ")"
+    )
 
 
+# Enrols a student into a course
 def enrol_student(courses, students):
-    pass
+
+    # Ask the user for the student ID
+    student_id = input("Student ID: ").strip()
+
+    # Ask the user for the course ID
+    course_id = input("Course ID: ").strip()
+
+ # Check if the student exists
+    if student_id not in students:
+        print("Student not found.")
+        return
+
+    # Check if the course exists
+    if course_id not in courses:
+        print("Course not found.")
+        return
+
+    # Check if the course has reached its maximum capacity
+    if len(courses[course_id]["roster"]) >= courses[course_id]["capacity"]:
+        print(
+            course_id + ": " +
+            courses[course_id]["name"] +
+            " is full (" +
+            str(len(courses[course_id]["roster"])) +
+            "/" +
+            str(courses[course_id]["capacity"]) +
+            " enrolled)."
+        )
+        return
+
+    # Check if the student is already enrolled in the course
+    if course_id in students[student_id]["enrolments"]:
+        print(
+            student_id + " " +
+            students[student_id]["name"] +
+            " is already enrolled in " +
+            course_id + ": " +
+            courses[course_id]["name"] + "."
+        )
+        return
+
+    # Add the student to the course roster
+    courses[course_id]["roster"].append(student_id)
+
+    # Add an empty marks list to the student's enrolments
+    students[student_id]["enrolments"][course_id] = []
+
+    # Display a success message
+    print(
+        student_id + " " +
+        students[student_id]["name"] +
+        " enrolled in " +
+        course_id + ": " +
+        courses[course_id]["name"]
+    )
 
 
+
+# Withdraws a student from a course
 def withdraw_student(courses, students):
-    pass
+
+    # Ask the user for the student ID
+    student_id = input("Student ID: ").strip()
+
+    # Ask the user for the course ID
+    course_id = input("Course ID: ").strip()
+
+    # Check if the student exists
+    if student_id not in students:
+        print("Student not found.")
+        return
+
+    # Check if the course exists
+    if course_id not in courses:
+        print("Course not found.")
+        return
+
+    # Check if the student is enrolled in the course
+    if course_id not in students[student_id]["enrolments"]:
+        print(
+            student_id + " " +
+            students[student_id]["name"] +
+            " is not enrolled in " +
+            course_id + ": " +
+            courses[course_id]["name"] + "."
+        )
+        return
+
+    # Ask the user to confirm the withdrawal
+    confirm = input(
+        "Withdraw " +
+        student_id + " " +
+        students[student_id]["name"] +
+        " from " +
+        course_id + ": " +
+        courses[course_id]["name"] +
+        "? (y/n): "
+    ).strip().lower()
+
+    # Check if the user confirmed the withdrawal
+    if confirm != "y":
+        print("Withdrawal cancelled.")
+        return
+
+    # Remove the student from the course roster
+    courses[course_id]["roster"].remove(student_id)
+
+    # Remove the course from the student's enrolments
+    del students[student_id]["enrolments"][course_id]
+
+    # Display a success message
+    print(
+        student_id + " " +
+        students[student_id]["name"] +
+        " withdrawn from " +
+        course_id + ": " +
+        courses[course_id]["name"]
+    )
 
 
 # ==========================
@@ -46,19 +330,151 @@ def withdraw_student(courses, students):
 # ==========================
 
 def register_student(students):
-    pass
+    print("\n--- Register Student ---")
+
+    student_id = input("Enter student ID: ").strip().upper()
+
+    while student_id == "":
+        print("Student ID cannot be blank.")
+        student_id = input("Enter student ID: ").strip().upper()
+
+    if student_id in students:
+        print("Student ID already exists.")
+        return
+
+    student_name = input("Enter student name: ").strip()
+
+    while student_name == "":
+        print("Student name cannot be blank.")
+        student_name = input("Enter student name: ").strip()
+
+    students[student_id] = {
+        "name": student_name,
+        "enrolments": {}
+    }
+
+    print(
+        student_id + " " +
+        students[student_id]["name"] +
+        " registered successfully."
+    )
 
 def record_mark(courses, students):
-    pass
+    print("\n--- Record Mark ---")
+
+    student_id = input("Enter student ID: ").strip().upper()
+
+    while student_id == "":
+        print("Student ID cannot be blank.")
+        student_id = input("Enter student ID: ").strip().upper()
+
+    course_id = input("Enter course ID: ").strip().upper()
+
+    while course_id == "":
+        print("Course ID cannot be blank.")
+        course_id = input("Enter course ID: ").strip().upper()
+
+    if student_id not in students:
+        print("Student does not exist.")
+        return
+
+    if course_id not in courses:
+        print("Course does not exist.")
+        return
+
+    if course_id not in students[student_id]["enrolments"]:
+        print("Student is not enrolled in this course.")
+        return
+
+    while True:
+        mark_text = input("Enter mark from 0 to 100: ").strip()
+
+        try:
+            mark = float(mark_text)
+        except ValueError:
+            print("Invalid mark. Enter a number.")
+            continue
+
+        if mark < 0 or mark > 100:
+            print("Mark must be between 0 and 100.")
+        else:
+            break
+
+    students[student_id]["enrolments"][course_id].append(mark)
+    print(
+        str(mark) + " recorded for " +
+        student_id + " " +
+        students[student_id]["name"] +
+        " in " +
+        course_id + ": " +
+        courses[course_id]["name"]
+    )
 
 
 def course_average_for(students, student_id, course_id):
-    pass
+    marks = students[student_id]["enrolments"][course_id]
 
+    if len(marks) == 0:
+        return (0, 0)
+
+    total = 0
+
+    for mark in marks:
+        total = total + mark
+
+    average = total / len(marks)
+
+    return (average, len(marks))
 
 
 def student_transcript(courses, students):
-    pass
+    print("\n--- Student Transcript ---")
+
+    student_id = input("Enter student ID: ").strip().upper()
+
+    while student_id == "":
+        print("Student ID cannot be blank.")
+        student_id = input("Enter student ID: ").strip().upper()
+
+    if student_id not in students:
+        print("Student does not exist.")
+        return
+
+    print("\nStudent ID:", student_id)
+    print("Student name:", students[student_id]["name"])
+
+    if len(students[student_id]["enrolments"]) == 0:
+        print("This student has no enrolments.")
+        return
+
+    overall_total = 0
+    overall_mark_count = 0
+
+    for course_id in students[student_id]["enrolments"]:
+        marks = students[student_id]["enrolments"][course_id]
+
+        print("\nCourse ID:", course_id)
+        print("Course name:", courses[course_id]["name"])
+
+        if len(marks) == 0:
+            print("No marks recorded.")
+        else:
+            average, mark_count = course_average_for(
+                students, student_id, course_id
+            )
+
+            print("Marks:", marks)
+            print("Course average:", round(average, 2))
+
+            for mark in marks:
+                overall_total = overall_total + mark
+                overall_mark_count = overall_mark_count + 1
+
+    if overall_mark_count == 0:
+        print("\nOverall average: No marks recorded.")
+    else:
+        overall_average = overall_total / overall_mark_count
+        print("\nOverall average:", round(overall_average, 2))
 
 
 # ==========================
@@ -66,15 +482,154 @@ def student_transcript(courses, students):
 # ==========================
 
 def course_report(courses, students):
-    pass
+    print("\n--- Course Report ---")
+    course_id = input("Enter course ID: ").strip().upper()
+    course_info = courses.get(course_id)
+    if course_info == None:
+        print(course_id, "does not exist.")
+        return
+
+    roster = course_info["roster"]
+    capacity = course_info["capacity"]
+    pass_mark = course_info["pass_mark"]
+
+    print("COURSE REPORT -", course_id, ":", course_info["name"], "(pass mark", pass_mark, ")")
+
+    total_marks_sum = 0
+    total_marks_count = 0
+    passing_students = 0
+    students_with_marks = 0
+
+    leaderboard_list = []
+    no_marks_list = []
+
+    for student_id in roster:
+        average, count = course_average_for(students, student_id, course_id)
+        if count > 0:
+            total_marks_sum = total_marks_sum + (average * count)
+            total_marks_count = total_marks_count + count
+            students_with_marks = students_with_marks + 1
+            if average >= pass_mark:
+                passing_students = passing_students + 1
+            leaderboard_list.append((average, student_id))
+        else:
+            no_marks_list.append(student_id)
+
+    if total_marks_count > 0:
+        course_average = round(total_marks_sum / total_marks_count, 1)
+        pass_rate = round((passing_students / students_with_marks) * 100, 1)
+        print("Enrolled:", len(roster), "of", capacity, "| Course average:", course_average, "| Pass rate:", pass_rate, "%")
+    else:
+        print("Enrolled:", len(roster), "of", capacity, "| Course average: n/a | Pass rate: n/a")
+
+    print("Leaderboard:")
+    leaderboard_sorted = sorted(leaderboard_list, reverse=True)
+    rank = 1
+    for average, student_id in leaderboard_sorted:
+        student_name = students[student_id]["name"]
+        print(" ", rank, ".", student_id, student_name, round(average, 1))
+        rank = rank + 1
+
+    for student_id in no_marks_list:
+        student_name = students[student_id]["name"]
+        print(" ", student_id, student_name, "- no marks yet")
 
 
 def search_everything(courses, students):
-    pass
+
+    print("\n--- Search ---")
+    keyword = input("Enter a search keyword: ").strip().lower()
+
+    matched_students = []
+    for student_id, student_info in students.items():
+        name_lower = student_info["name"].lower()
+        if name_lower.count(keyword) > 0:
+            matched_students.append((student_id, student_info["name"]))
+
+    matched_courses = []
+    for course_id, course_info in courses.items():
+        name_lower = course_info["name"].lower()
+        if name_lower.count(keyword) > 0:
+            matched_courses.append((course_id, course_info["name"]))
+
+    if len(matched_students) == 0 and len(matched_courses) == 0:
+        print("No matches.")
+        return
+
+    if len(matched_students) > 0:
+        print("Students:")
+        for student_id, name in matched_students:
+            print(" ", student_id, ":", name)
+
+    if len(matched_courses) > 0:
+        print("Courses:")
+        for course_id, name in matched_courses:
+            print(" ", course_id, ":", name)
 
 
 def academy_report(courses, students):
-    pass
+    print("\n--- Academy Report ---")
+    total_students, total_enrolments, total_marks = academy_totals(students)
+
+    if total_students == 0:
+        print("No students registered yet.")
+        return
+
+    print("Students:", total_students)
+    print("Courses:", len(courses))
+    print("Enrolments:", total_enrolments)
+    print("Marks recorded:", total_marks)
+
+    total_sum = 0
+    total_count = 0
+    for student_id, student_info in students.items():
+        for course_id, marks_list in student_info["enrolments"].items():
+            for mark in marks_list:
+                total_sum = total_sum + mark
+                total_count = total_count + 1
+
+    if total_count > 0:
+        print("Academy-wide average:", round(total_sum / total_count, 1))
+    else:
+        print("Academy-wide average: n/a")
+
+    best_id, best_average = best_course(courses, students)
+    if best_id == None:
+        print("Best performing course: none yet.")
+    else:
+        print("Best performing course:", best_id, ":", courses[best_id]["name"], "with average", best_average)
+
+    distinction_list = []
+    at_risk_list = []
+
+    for student_id, student_info in students.items():
+        student_sum = 0
+        student_count = 0
+        for course_id in student_info["enrolments"]:
+            average, count = course_average_for(students, student_id, course_id)
+            student_sum = student_sum + (average * count)
+            student_count = student_count + count
+
+        if student_count > 0:
+            student_average = student_sum / student_count
+            if student_average >= 80:
+                distinction_list.append((student_id, student_info["name"], round(student_average, 1)))
+            if student_average < 50:
+                at_risk_list.append((student_id, student_info["name"], round(student_average, 1)))
+
+    print("Distinction list (average 80+):")
+    if len(distinction_list) == 0:
+        print("  None yet.")
+    else:
+        for student_id, name, average in distinction_list:
+            print(" ", student_id, name, average)
+
+    print("At risk list (average below 50):")
+    if len(at_risk_list) == 0:
+        print("  None yet.")
+    else:
+        for student_id, name, average in at_risk_list:
+            print(" ", student_id, name, average)
 
 
 # ==========================
