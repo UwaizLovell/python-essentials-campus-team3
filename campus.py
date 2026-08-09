@@ -122,7 +122,39 @@ def best_course(courses, students):
 
 # Team choice tuple helper
 def highest_and_lowest(students, student_id):
-    pass
+    if student_id not in students:
+        return None, None
+
+    courses = students[student_id].get("courses", {})
+
+    if not courses:
+        return None, None
+
+    highest_course = None
+    highest_mark = -1
+
+    lowest_course = None
+    lowest_mark = 101
+
+    for course_id, mark in courses.items():
+        if not isinstance(mark, (int, float)):
+            continue
+
+        if mark > highest_mark:
+            highest_mark = mark
+            highest_course = course_id
+
+        if mark < lowest_mark:
+            lowest_mark = mark
+            lowest_course = course_id
+
+    if highest_course is None:
+        return None, None
+
+    return (
+        (highest_course, highest_mark),
+        (lowest_course, lowest_mark)
+    )
 
 
 # ==========================
