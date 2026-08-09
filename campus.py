@@ -482,11 +482,61 @@ def student_transcript(courses, students):
 # ==========================
 
 def course_report(courses, students):
-    pass
+    print("\n--- Course Report ---")
+    course_id = input("Enter course ID: ").strip().upper()
+    course_info = courses.get(course_id)
+    if course_info == None:
+        print(course_id, "does not exist.")
+        return
+
+    roster = course_info["roster"]
+    capacity = course_info["capacity"]
+    pass_mark = course_info["pass_mark"]
+
+    print("COURSE REPORT -", course_id, ":", course_info["name"], "(pass mark", pass_mark, ")")
+
+    total_marks_sum = 0
+    total_marks_count = 0
+    passing_students = 0
+    students_with_marks = 0
+
+    leaderboard_list = []
+    no_marks_list = []
+
+    for student_id in roster:
+        average, count = course_average_for(students, student_id, course_id)
+        if count > 0:
+            total_marks_sum = total_marks_sum + (average * count)
+            total_marks_count = total_marks_count + count
+            students_with_marks = students_with_marks + 1
+            if average >= pass_mark:
+                passing_students = passing_students + 1
+            leaderboard_list.append((average, student_id))
+        else:
+            no_marks_list.append(student_id)
+
+    if total_marks_count > 0:
+        course_average = round(total_marks_sum / total_marks_count, 1)
+        pass_rate = round((passing_students / students_with_marks) * 100, 1)
+        print("Enrolled:", len(roster), "of", capacity, "| Course average:", course_average, "| Pass rate:", pass_rate, "%")
+    else:
+        print("Enrolled:", len(roster), "of", capacity, "| Course average: n/a | Pass rate: n/a")
+
+    print("Leaderboard:")
+    leaderboard_sorted = sorted(leaderboard_list, reverse=True)
+    rank = 1
+    for average, student_id in leaderboard_sorted:
+        student_name = students[student_id]["name"]
+        print(" ", rank, ".", student_id, student_name, round(average, 1))
+        rank = rank + 1
+
+    for student_id in no_marks_list:
+        student_name = students[student_id]["name"]
+        print(" ", student_id, student_name, "- no marks yet")
 
 
 def search_everything(courses, students):
-    
+
     print("\n--- Search ---")
     keyword = input("Enter a search keyword: ").strip().lower()
 
@@ -518,7 +568,68 @@ def search_everything(courses, students):
 
 
 def academy_report(courses, students):
-    pass
+    print("\n--- Academy Report ---")
+    total_students, total_enrolments, total_marks = academy_totals(students)
+
+    if total_students == 0:
+        print("No students registered yet.")
+        return
+
+    print("Students:", total_students)
+    print("Courses:", len(courses))
+    print("Enrolments:", total_enrolments)
+    print("Marks recorded:", total_marks)
+
+    total_sum = 0
+    total_count = 0
+    for student_id, student_info in students.items():
+        for course_id, marks_list in student_info["enrolments"].items():
+            for mark in marks_list:
+                total_sum = total_sum + mark
+                total_count = total_count + 1
+
+    if total_count > 0:
+        print("Academy-wide average:", round(total_sum / total_count, 1))
+    else:
+        print("Academy-wide average: n/a")
+
+    best_id, best_average = best_course(courses, students)
+    if best_id == None:
+        print("Best performing course: none yet.")
+    else:
+        print("Best performing course:", best_id, ":", courses[best_id]["name"], "with average", best_average)
+
+    distinction_list = []
+    at_risk_list = []
+
+    for student_id, student_info in students.items():
+        student_sum = 0
+        student_count = 0
+        for course_id in student_info["enrolments"]:
+            average, count = course_average_for(students, student_id, course_id)
+            student_sum = student_sum + (average * count)
+            student_count = student_count + count
+
+        if student_count > 0:
+            student_average = student_sum / student_count
+            if student_average >= 80:
+                distinction_list.append((student_id, student_info["name"], round(student_average, 1)))
+            if student_average < 50:
+                at_risk_list.append((student_id, student_info["name"], round(student_average, 1)))
+
+    print("Distinction list (average 80+):")
+    if len(distinction_list) == 0:
+        print("  None yet.")
+    else:
+        for student_id, name, average in distinction_list:
+            print(" ", student_id, name, average)
+
+    print("At risk list (average below 50):")
+    if len(at_risk_list) == 0:
+        print("  None yet.")
+    else:
+        for student_id, name, average in at_risk_list:
+            print(" ", student_id, name, average)
 
 
 # ==========================
